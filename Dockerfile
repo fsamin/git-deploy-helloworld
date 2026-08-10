@@ -6,5 +6,4 @@ RUN CGO_ENABLED=0 go build -o /helloworld .
 
 FROM scratch
 COPY --from=build /helloworld /helloworld
-EXPOSE 8080
 ENTRYPOINT ["/helloworld"]
