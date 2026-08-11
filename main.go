@@ -8,7 +8,7 @@ import (
 )
 
 // version is bumped on each demo commit to make rolling updates visible.
-const version = "v6"
+const version = "v7"
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
