@@ -13,7 +13,7 @@ const version = "v9"
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		hostname, _ := os.Hostname()
-		fmt.Fprintf(w, "Hello from git-deploy-helloworld %s (pod %s)\n", version, hostname)
+		fmt.Fprintf(w, "Hello Thomas, from git-deploy-helloworld %s (pod %s)\n", version, hostname)
 	})
 	log.Println("listening on :8080, version", version)
 	log.Fatal(http.ListenAndServe(":8080", nil))
