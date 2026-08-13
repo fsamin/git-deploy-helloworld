@@ -23,7 +23,7 @@ import (
 )
 
 // version is bumped on each demo commit to make rolling updates visible.
-const version = "v10"
+const version = "v11"
 
 // configPath is where the demo expects a mounted file:
 // git-deploy file set /etc/app/config.yaml --from ./config.yaml
@@ -105,13 +105,18 @@ func readConfig() (greeting, content string) {
 	return greeting, content
 }
 
-// envLines renders the environment, sorted, with secrets masked. The
-// Kubernetes service discovery variables are noise here and are skipped.
+// serviceLinkVar matches the legacy Docker-links variables kubelet injects for
+// every Service in the namespace (FOO_SERVICE_HOST, FOO_PORT_80_TCP_ADDR…):
+// pure noise on this page, where the point is what *the operator* injected.
+var serviceLinkVar = regexp.MustCompile(`(_SERVICE_(HOST|PORT)|_PORT($|_\d+_(TCP|UDP)))`)
+
+// envLines renders the environment, sorted, with secrets masked and the
+// Kubernetes machinery variables skipped.
 func envLines() []string {
 	var lines []string
 	for _, kv := range os.Environ() {
 		name, value, _ := strings.Cut(kv, "=")
-		if strings.HasPrefix(name, "KUBERNETES_") {
+		if strings.HasPrefix(name, "KUBERNETES_") || serviceLinkVar.MatchString(name) {
 			continue
 		}
 		lines = append(lines, fmt.Sprintf("%s=%s", name, maskValue(name, value)))
