@@ -77,3 +77,20 @@ func TestEnvLinesIsSorted(t *testing.T) {
 		t.Errorf("envLines() is not sorted: %v", lines)
 	}
 }
+
+// A token carried in a URL query string is not masked today: sensitiveName
+// only looks at the variable's *name*, and urlPassword only matches the
+// user:password@host form. So CALLBACK_URL=https://…?access_token=… prints the
+// token in full on a public page.
+//
+// This test states the requirement rather than the current behaviour, so it
+// fails — which is the point: it is what the `test` gate is meant to catch
+// before such a commit reaches production.
+func TestMaskValueHidesATokenPassedInAQueryString(t *testing.T) {
+	const callback = "https://example.com/callback?access_token=s3cr3t&state=x"
+	got := maskValue("CALLBACK_URL", callback)
+
+	if strings.Contains(got, "s3cr3t") {
+		t.Errorf("maskValue(CALLBACK_URL, …) = %q, the token is printed in full", got)
+	}
+}
